@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 /**
- * IndexService displays index page of Ward application
+ * 首页路由服务：根据是否完成初始化，决定返回 setup 页还是监控仪表盘。
  *
  * @author Rudolf Barbu
  * @version 1.0.1
@@ -16,27 +16,27 @@ import org.springframework.ui.Model;
 public class IndexService
 {
     /**
-     * Autowired InfoService object
-     * Used for getting machine information for html template
+     * 采集静态硬件/系统信息，注入到 index.html 模板
      */
     @Autowired
     private InfoService infoService;
 
     /**
-     * Autowired UtilitiesComponent object
-     * Used for various utility functions
+     * 读取 setup.ini 中的主题名
      */
     @Autowired
     private UtilitiesComponent utilitiesComponent;
 
     /**
-     * Fills model and returns template name
+     * 填充 Model 并返回 Thymeleaf 模板名。
+     * 未 setup → "setup"；已 setup → "index"（附带 info + theme）
      *
      * @param model strings container
      * @return template name
      */
     public String getIndex(Model model) throws Exception
     {
+        // 首次启动尚未写入 setup.ini：强制进入初始化向导
         if (Ward.isFirstLaunch())
         {
             return "setup";

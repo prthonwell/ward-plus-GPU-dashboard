@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * InfoDto is a container for other info objects
+ * /api/info 响应聚合体：嵌套 processor / machine / storage / gpu / uptime / setup / project
  *
  * @author Rudolf Barbu
  * @version 1.0.1
@@ -27,6 +27,11 @@ public class InfoDto
      *  Storage info dto field
      */
     private StorageDto storage;
+
+    /**
+     *  GPU info dto field（NVML）
+     */
+    private GpuDto gpu;
 
     /**
      *  Uptime info dto field

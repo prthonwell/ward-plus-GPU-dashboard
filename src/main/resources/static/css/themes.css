@@ -43,6 +43,14 @@ html[theme = "light"]
     --color-values-grid-div: var(--grey);
     --color-labels-grid-div: var(--grey-light);
     --color-chart-label: var(--black);
+    --color-chart-legend-swatch: var(--grey);
+    --color-charts-control-btn: var(--grey);
+    --color-charts-control-btn-active: var(--white);
+    --color-chart-cell-title: var(--grey);
+    --color-chart-cell-title-first: var(--blue);
+    --color-chart-cell-title-second: var(--red);
+    --color-chart-cell-title-third: var(--green);
+    --color-chart-cell-title-fourth: var(--orange);
     --color-project-version: var(--grey);
     --color-code: var(--black);
     --color-title: var(--black);
@@ -69,18 +77,23 @@ html[theme = "light"]
     --background-hw-logo-first: var(--blue-light);
     --background-hw-logo-second: var(--red-light);
     --background-hw-logo-third: var(--green-light);
+    --background-hw-logo-fourth: var(--orange-light);
     --background-card-body-squares-grid-first-div: var(--blue-light);
     --background-card-body-squares-grid-second-div: var(--red-light);
     --background-card-body-squares-grid-third-div: var(--green-light);
+    --background-card-body-squares-grid-fourth-div: var(--orange-light);
     --background-usage-underline-first: var(--blue-light);
     --background-usage-underline-second: var(--red-light);
     --background-usage-underline-third: var(--green-light);
+    --background-usage-underline-fourth: var(--orange-light);
     --background-footer-first: var(--blue-light);
     --background-footer-first-card-footer-dots-grid-div-inner-dot: var(--blue);
     --background-footer-second: var(--red-light);
     --background-footer-second-card-footer-dots-grid-div-inner-dot: var(--red);
     --background-footer-third: var(--green-light);
     --background-footer-third-card-footer-dots-grid-div-inner-dot: var(--green);
+    --background-footer-fourth: var(--orange-light);
+    --background-footer-fourth-card-footer-dots-grid-div-inner-dot: var(--orange);
     --background-card-footer-dots-grid-div: var(--white);
     --background-dividers-div: var(--white);
     --background-uptime: var(--linear-gradient-uptime-light);
@@ -92,12 +105,19 @@ html[theme = "light"]
     --background-chart-rectangle-grid-first: var(--blue-light);
     --background-chart-rectangle-grid-second: var(--red-light);
     --background-chart-rectangle-grid-third: var(--green-light);
+    --background-chart-rectangle-grid-fourth: var(--orange-light);
+    --background-chart-rectangle-grid-fifth: var(--violet-light);
+    --background-charts-control-btn: var(--blue-light);
+    --background-charts-control-btn-active: var(--blue);
+    --background-chart-cell: var(--white);
     --background-error-div: var(--white);
 
     /* border-color */
     --border-color-chart-triangle-grid-first: var(--blue);
     --border-color-chart-triangle-grid-second: var(--red);
     --border-color-chart-triangle-grid-third: var(--green);
+    --border-color-chart-triangle-grid-fourth: var(--orange);
+    --border-color-chart-triangle-grid-fifth: var(--violet);
 }
 
 /* dark */
@@ -128,6 +148,14 @@ html[theme = "dark"]
     --color-values-grid-div: var(--white);
     --color-labels-grid-div: var(--grey-light);
     --color-chart-label: var(--white);
+    --color-chart-legend-swatch: var(--white);
+    --color-charts-control-btn: var(--grey-light);
+    --color-charts-control-btn-active: var(--white);
+    --color-chart-cell-title: var(--grey-light);
+    --color-chart-cell-title-first: var(--blue);
+    --color-chart-cell-title-second: var(--red);
+    --color-chart-cell-title-third: var(--green);
+    --color-chart-cell-title-fourth: var(--orange);
     --color-project-version: var(--white);
     --color-code: var(--white);
     --color-title: var(--white);
@@ -154,18 +182,23 @@ html[theme = "dark"]
     --background-hw-logo-first: var(--grey);
     --background-hw-logo-second: var(--grey);
     --background-hw-logo-third: var(--grey);
+    --background-hw-logo-fourth: var(--grey);
     --background-card-body-squares-grid-first-div: var(--grey);
     --background-card-body-squares-grid-second-div: var(--grey);
     --background-card-body-squares-grid-third-div: var(--grey);
+    --background-card-body-squares-grid-fourth-div: var(--grey);
     --background-usage-underline-first: var(--grey);
     --background-usage-underline-second: var(--grey);
     --background-usage-underline-third: var(--grey);
+    --background-usage-underline-fourth: var(--grey);
     --background-footer-first: var(--grey);
     --background-footer-first-card-footer-dots-grid-div-inner-dot: var(--grey-light);
     --background-footer-second: var(--grey);
     --background-footer-second-card-footer-dots-grid-div-inner-dot: var(--grey-light);
     --background-footer-third: var(--grey);
     --background-footer-third-card-footer-dots-grid-div-inner-dot: var(--grey-light);
+    --background-footer-fourth: var(--grey);
+    --background-footer-fourth-card-footer-dots-grid-div-inner-dot: var(--grey-light);
     --background-card-footer-dots-grid-div: var(--grey-dark);
     --background-dividers-div: var(--grey-dark);
     --background-uptime: var(--linear-gradient-uptime-dark);
@@ -177,10 +210,17 @@ html[theme = "dark"]
     --background-chart-rectangle-grid-first: var(--grey);
     --background-chart-rectangle-grid-second: var(--grey);
     --background-chart-rectangle-grid-third: var(--grey);
+    --background-chart-rectangle-grid-fourth: var(--grey);
+    --background-chart-rectangle-grid-fifth: var(--grey);
+    --background-charts-control-btn: var(--grey);
+    --background-charts-control-btn-active: var(--grey-light);
+    --background-chart-cell: var(--grey-dark);
     --background-error-div: var(--grey-dark);
 
     /* border-color */
     --border-color-chart-triangle-grid-first: var(--grey-light);
     --border-color-chart-triangle-grid-second: var(--grey-light);
     --border-color-chart-triangle-grid-third: var(--grey-light);
+    --border-color-chart-triangle-grid-fourth: var(--grey-light);
+    --border-color-chart-triangle-grid-fifth: var(--grey-light);
 }

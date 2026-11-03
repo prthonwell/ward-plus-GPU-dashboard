@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * IndexController displays index page of Ward application
+ * 页面入口控制器：GET / → setup.html 或 index.html（由 IndexService 按 isFirstLaunch 决定）
  *
  * @author Rudolf Barbu
  * @version 1.0.2
@@ -18,14 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class IndexController
 {
     /**
-     * Autowired IndexService object
-     * Used for getting index page template
+     * 首页业务：决定模板并填充硬件信息 / 主题
      */
     @Autowired
     private IndexService indexService;
 
     /**
-     * Get request to display index page
+     * 打开根路径时渲染仪表盘或初始化向导
      *
      * @param model used for providing values in to html template
      * @return String name of html template with values from model param

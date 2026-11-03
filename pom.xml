@@ -17,12 +17,20 @@
     <!-- project properties -->
     <properties>
         <oshiVersion>5.3.6</oshiVersion>
-        <jnaVersion>5.6.0</jnaVersion>
-        <lombokVersion>1.18.16</lombokVersion>
+        <jnaVersion>5.14.0</jnaVersion>
+        <lombokVersion>1.18.42</lombokVersion>
         <ini4jVersion>0.5.4</ini4jVersion>
     </properties>
 
-    <!-- project dependencies -->
+    <!--
+      依赖说明：
+      - spring-boot-starter-web：嵌入式 Tomcat + REST
+      - thymeleaf：服务端渲染 setup/index/error 页面
+      - validation：SetupDto 字段校验
+      - oshi-core + jna：跨平台采集 CPU/内存/磁盘/uptime
+      - lombok：DTO getter/setter
+      - ini4j：读写 setup.ini
+    -->
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -55,6 +63,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombokVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ini4j</groupId>
@@ -66,6 +75,19 @@
     <!-- project build plugins -->
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombokVersion}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

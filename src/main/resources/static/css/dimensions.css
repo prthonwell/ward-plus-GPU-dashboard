@@ -41,9 +41,14 @@
     --top-contacts-links-a-img: 4.906rem;
     --top-uptime-rectangle-grid: 1.925rem;
     --top-chart-label: 1.500rem;
-    --top-chart-triangle-grid: 0.500rem;
-    --top-chart-rectangle-grid: 1.906rem;
     --top-chart-container: 3.375rem;
+    --padding-charts-panel: 1.250rem;
+    --padding-chart-cell: 0.750rem;
+    --padding-x-charts-control-btn: 0.750rem;
+    --margin-bottom-charts-toolbar: 1.000rem;
+    --margin-bottom-chart-cell-title: 0.500rem;
+    --gap-charts-controls: 0.500rem;
+    --gap-charts-grid: 0.875rem;
     --top-code: 1.813rem;
     --top-title: 3.500rem;
     --top-explanation: 6.688rem;
@@ -83,17 +88,22 @@
     --left-dividers-second: 14.563rem;
     --left-controls-first: 0.750rem;
     --left-controls-second: 19.250rem;
-    --left-contacts-links-a-first: 8.075rem;
+    --left-contacts-links-a-first: 9.875rem;
     --left-contacts-links-a-second: 11.700rem;
     --left-uptime-squares-grid: 9.250rem;
     --left-uptime-rectangle-grid: 2.781rem;
     --left-chart-label: 1.500rem;
-    --left-chart-triangle-grid-first: 34.375rem;
-    --left-chart-triangle-grid-second: 38.250rem;
-    --left-chart-triangle-grid-third: 42.125rem;
-    --left-chart-rectangle-grid-first: 33.250rem;
-    --left-chart-rectangle-grid-second: 37.125rem;
-    --left-chart-rectangle-grid-third: 41.000rem;
+    /* 5 条利用率图例靠右排列，避免超出 chart 卡片被 overflow 裁切 */
+    --left-chart-triangle-grid-first: 24.750rem;
+    --left-chart-triangle-grid-second: 28.250rem;
+    --left-chart-triangle-grid-third: 31.750rem;
+    --left-chart-triangle-grid-fourth: 35.250rem;
+    --left-chart-triangle-grid-fifth: 38.750rem;
+    --left-chart-rectangle-grid-first: 23.625rem;
+    --left-chart-rectangle-grid-second: 27.125rem;
+    --left-chart-rectangle-grid-third: 30.625rem;
+    --left-chart-rectangle-grid-fourth: 34.125rem;
+    --left-chart-rectangle-grid-fifth: 37.625rem;
     --left-chart-container: 1.500rem;
     --left-error-div: 13.250rem;
     --left-code: 1.813rem;
@@ -108,11 +118,15 @@
     --margin-right-values-grid-div: 0.125rem;
     --margin-right-labels-grid-div: 0.125rem;
 
+    /* margin-top */
+    --margin-top-index: 1.500rem;
+
     /* margin-bottom */
     --margin-bottom-label-main-settings: 0.438rem;
     --margin-bottom-card: 1.875rem;
     --margin-bottom-card-body-squares-grid-div: 0.750rem;
     --margin-bottom-labels-grid-div: 0.313rem;
+    --margin-bottom-index: 2.000rem;
 
     /* height */
     --height-body: 100%;
@@ -130,9 +144,10 @@
     --height-button-squares-grid-div: 0.625rem;;
     --height-port: 3.125rem;
     --height-submit: 1.875rem;
-    --height-index-xl: 35.031rem;
-    --height-index-lg: 53.438rem;
-    --height-index-md: 53.438rem;
+    /* 含 GPU 卡片 + 四图面板后的大致内容高度 */
+    --height-index-xl: 72.000rem;
+    --height-index-lg: 90.000rem;
+    --height-index-md: 90.000rem;
     --height-hw-logo: 3.750rem;
     --height-usage: 5.313rem;
     --height-card-body-squares-grid-div: 0.625rem;
@@ -153,6 +168,12 @@
     --height-labels-grid-div: 0.813rem;
     --height-chart-rectangle-grid-div: 0.625rem;
     --height-chart-container: 11.688rem;
+    --height-charts-control-btn: 1.750rem;
+    --height-chart-cell-body: 11.000rem;
+    --min-height-charts-panel: 30.000rem;
+    --min-height-chart-cell: 13.500rem;
+    --border-radius-charts-control-btn: 0.250rem;
+    --border-radius-chart-cell: 0.500rem;
     --height-error: 25.750rem;
     --height-error-img: 19.313rem;
     --height-error-div: 12.125rem;

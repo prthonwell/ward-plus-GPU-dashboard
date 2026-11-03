@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * Initializes uptime, labels and chart values
+ * 仪表盘页初始化：绑定 DOM、启动 usage 长轮询与 info 定时刷新、注册翻页控件
  */
 function indexInitialization()
 {
@@ -30,7 +30,8 @@ function indexInitialization()
     usageXHR = new XMLHttpRequest();
     infoXHR = new XMLHttpRequest();
 
-    sendUsageRequest();
+    // 图表：进入页拉一次历史；之后仅点击区间/Refresh 才刷新（不再长轮询）
+    loadUsageHistory();
 
     setInterval(function()
     {
@@ -59,7 +60,8 @@ function showCards()
         {
             cards[randomSequenceArray[i]].style.opacity = "1";
 
-            if (randomSequenceArray[i] == 4)
+            // 最后一张为图表卡，同时淡入版本号
+            if (randomSequenceArray[i] == (cards.length - 1))
             {
                 versionLabel.style.opacity = "1";
             }
@@ -73,10 +75,11 @@ function showCards()
 function getRandomSequenceArray()
 {
     let buffer = [];
+    let cardsCount = document.getElementsByClassName("card").length;
 
-    while (buffer.length < 5)
+    while (buffer.length < cardsCount)
     {
-        let randomNumber = Math.floor(Math.random() * 5);
+        let randomNumber = Math.floor(Math.random() * cardsCount);
 
         if ((buffer.indexOf(randomNumber) === -1))
         {
@@ -88,29 +91,7 @@ function getRandomSequenceArray()
 }
 
 /**
- * Sending ajax request to receive usage info
- */
-function sendUsageRequest()
-{
-    usageXHR.onreadystatechange = function()
-    {
-        if ((this.readyState == 4) && (this.status == 200))
-        {
-            let response = JSON.parse(this.response);
-
-            labelsTick(response);
-            chartTick(response);
-
-            sendUsageRequest();
-        }
-    }
-
-    usageXHR.open("GET", "/api/usage");
-    usageXHR.send();
-}
-
-/**
- * Sending ajax request to receive info about server
+ * 请求 /api/info：刷新时钟频率、进程数、磁盘总量与 uptime 数字
  */
 function sendInfoRequest()
 {

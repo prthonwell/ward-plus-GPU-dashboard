@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- 监控仪表盘：服务端注入 info（硬件信息）与 theme；前端轮询 /api/usage、/api/info 刷新动态数据 -->
 <html xmlns:th = "http://www.thymeleaf.org" id = "html" th:attr = "theme = ${theme}">
     <head>
         <meta charset = "UTF-8">
@@ -183,6 +184,58 @@
                         </div>
                     </div>
                 </div>
+                <div class = "col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                    <div class = "card">
+                        <div class = "header">
+                            <div class = "hw-logo fourth"></div>
+                            <div class = "label-hw-info">
+                                <div class = "hw-type">Graphics</div>
+                                <div class = "hw-name" th:text = "${info.gpu.name}"></div>
+                            </div>
+                        </div>
+                        <div class = "usage">
+                            <div class = "card-body-squares-grid fourth">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                            <div class = "main-hw-info">
+                                <div class = "hw-usage">
+                                    <div class = "usage-value">
+                                        <span id = "gpu-hundreds" class = "first">0</span>
+                                        <span id = "gpu-tens" class = "second">0</span>
+                                        <span id = "gpu-ones" class = "third">0</span>
+                                    </div>
+                                    <div class = "usage-postfix">%</div>
+                                </div>
+                                <p class = "info-label">GPU USAGE</p>
+                                <div class = "usage-underline fourth"></div>
+                            </div>
+                        </div>
+                        <div class = "footer fourth">
+                            <div class = "card-footer-dots-grid">
+                                <div class = "first">
+                                    <div class = "inner-dot"></div>
+                                </div>
+                                <div class = "second">
+                                    <div class = "inner-dot"></div>
+                                </div>
+                                <div class = "third">
+                                    <div class = "inner-dot"></div>
+                                </div>
+                            </div>
+                            <div class = "detailed-hw-info">
+                                <div class = "first" th:text = "${info.gpu.totalMemory}"></div>
+                                <div id = "currentVramUsage" class = "second">0% VRAM</div>
+                                <div class = "third" th:text = "${info.gpu.driverVersion}"></div>
+                            </div>
+                            <div class = "dividers">
+                                <div class = "first"></div>
+                                <div class = "second"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <script type = "text/javascript" th:inline = "javascript"> labelsInitialization(); </script>
                 <div class = "col-sm-12 col-md-6 col-lg-6 col-xl-4 sm-hidden">
                     <div class = "card">
@@ -199,14 +252,11 @@
                                 <div class = "contacts-label">CONTACTS</div>
                                 <div class = "contacts-description">
                                     <div class = "first">Feel free to ask questions and leave feedback</div>
-                                    <div class = "second">You can also text author in Telegram</div>
+                                    <div class = "second">You can also open an issue on GitHub</div>
                                 </div>
                                 <div class = "contacts-links">
-                                    <a href = "https://github.com/B-Software/Ward">
+                                    <a href = "https://github.com/prthonwell/ward-plus-GPU-dashboard" target = "_blank" rel = "noopener noreferrer">
                                         <img class = "first" th:src = @{/img/links/github.png} />
-                                    </a>
-                                    <a href = "https://t.me/Rudolf_Barbu">
-                                        <img class = "second" th:src = @{/img/links/telegram.png} />
                                     </a>
                                 </div>
                             </div>
@@ -239,21 +289,43 @@
                         </div>
                     </div>
                 </div>
-                <div class = "col-lg-12 col-xl-8 sm-hidden">
-                    <div class = "card">
-                        <div class = "chart-label">% Utilization</div>
-                        <div class = "chart-triangle-grid">
-                            <div id = "processor-triangle" class = "first"></div>
-                            <div id = "ram-triangle" class = "second"></div>
-                            <div id = "storage-triangle" class = "third"></div>
+                <div class = "col-12 sm-hidden">
+                    <div class = "card charts-panel">
+                        <div class = "charts-toolbar">
+                            <div class = "chart-label">% Utilization</div>
+                            <div class = "charts-controls">
+                                <button type = "button" class = "charts-range-btn active" data-range = "10m">10 min</button>
+                                <button type = "button" class = "charts-range-btn" data-range = "1h">1 hour</button>
+                                <button type = "button" class = "charts-range-btn" data-range = "3h">3 hours</button>
+                                <button type = "button" id = "charts-refresh" class = "charts-refresh-btn">Refresh</button>
+                            </div>
                         </div>
-                        <div class = "chart-rectangle-grid">
-                            <div id = "processor-rectangle" class = "first"></div>
-                            <div id = "ram-rectangle" class = "second"></div>
-                            <div id = "storage-rectangle" class = "third"></div>
-                        </div>
-                        <div class = "chart-container">
-                            <canvas id = "chart-body"></canvas>
+                        <div class = "charts-grid">
+                            <div class = "chart-cell">
+                                <div class = "chart-cell-title first">
+                                    Processor · <span th:text = "${info.processor.coreCount}">Cores</span>
+                                </div>
+                                <div class = "chart-cell-body"><canvas id = "chart-cpu"></canvas></div>
+                            </div>
+                            <div class = "chart-cell">
+                                <div class = "chart-cell-title second">
+                                    Memory · <span th:text = "${info.machine.totalRam}">RAM</span>
+                                </div>
+                                <div class = "chart-cell-body"><canvas id = "chart-ram"></canvas></div>
+                            </div>
+                            <div class = "chart-cell">
+                                <div class = "chart-cell-title third">
+                                    Disk · <span th:text = "${info.storage.total}">Total</span>
+                                </div>
+                                <div class = "chart-cell-body"><canvas id = "chart-disk"></canvas></div>
+                            </div>
+                            <div class = "chart-cell">
+                                <div class = "chart-cell-title fourth">
+                                    <span th:text = "${info.gpu.name}">GPU</span>
+                                    · <span th:text = "${info.gpu.totalMemory}">VRAM</span>
+                                </div>
+                                <div class = "chart-cell-body"><canvas id = "chart-gpu"></canvas></div>
+                            </div>
                         </div>
                         <script type = "text/javascript" th:inline = "javascript"> chartInitialization(); </script>
                     </div>

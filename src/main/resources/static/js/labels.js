@@ -23,10 +23,18 @@ function labelsInitialization()
         document.getElementById("storage-tens"),
         document.getElementById("storage-ones")
     ];
+    gpuLabelsArray =
+    [
+        document.getElementById("gpu-hundreds"),
+        document.getElementById("gpu-tens"),
+        document.getElementById("gpu-ones")
+    ];
+    currentVramUsage = document.getElementById("currentVramUsage");
 }
 
 /**
- * Updates labels values
+ * 将 usage 百分比拆成百/十/个三位数字，分别写入对应 span，并按是否前导零切换颜色。
+ * vram 单独刷新卡片脚注文案（无独立大字号数字）。
  *
  * @param {*} usageData usage value
  */
@@ -51,6 +59,19 @@ function labelsTick(usageData)
             case 2:
             {
                 formatLabels(storageLabelsArray, usageDataArray[i]);
+                break;
+            }
+            case 3:
+            {
+                formatLabels(gpuLabelsArray, usageDataArray[i]);
+                break;
+            }
+            case 4:
+            {
+                if (currentVramUsage)
+                {
+                    currentVramUsage.innerHTML = usageDataArray[i] + "% VRAM";
+                }
                 break;
             }
         }

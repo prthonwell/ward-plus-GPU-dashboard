@@ -1,6 +1,7 @@
 package org.bsoftware.ward.services;
 
 import org.bsoftware.ward.Ward;
+import org.bsoftware.ward.components.NvmlComponent;
 import org.bsoftware.ward.dto.UsageDto;
 import org.bsoftware.ward.exceptions.ApplicationNotSetUpException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,9 @@ import oshi.util.Util;
 import java.util.Arrays;
 
 /**
- * UsageService provides principal information of processor, RAM and storage usage to rest controller
+ * 动态资源占用采集服务：返回 CPU / RAM / 磁盘 / GPU / 显存 使用率（0–100）。
+ * 历史采样由 UsageHistoryService 每 8 秒调用 collectUsage() 写入 jsonl；
+ * getProcessor() 内部 sleep 1s 用于两次 tick 差分。
  *
  * @author Rudolf Barbu
  * @version 1.0.3
@@ -23,14 +26,19 @@ import java.util.Arrays;
 public class UsageService
 {
     /**
-     * Autowired SystemInfo object
-     * Used for getting usage information
+     * OSHI 系统信息入口
      */
     @Autowired
     private SystemInfo systemInfo;
 
     /**
-     * Gets processor usage
+     * NVIDIA NVML：GPU / 显存实时占用
+     */
+    @Autowired
+    private NvmlComponent nvmlComponent;
+
+    /**
+     * 通过两次 tick 采样差计算 CPU 使用率（中间休眠 1 秒）
      *
      * @return int that display processor usage
      */
@@ -38,12 +46,14 @@ public class UsageService
     {
         CentralProcessor centralProcessor = systemInfo.getHardware().getProcessor();
 
+        // 第一次采样
         long[] prevTicksArray = centralProcessor.getSystemCpuLoadTicks();
         long prevTotalTicks = Arrays.stream(prevTicksArray).sum();
         long prevIdleTicks = prevTicksArray[CentralProcessor.TickType.IDLE.getIndex()];
 
         Util.sleep(1000);
 
+        // 第二次采样，用 idle 占比反推 busy 占比
         long[] currTicksArray = centralProcessor.getSystemCpuLoadTicks();
         long currTotalTicks = Arrays.stream(currTicksArray).sum();
         long currIdleTicks = currTicksArray[CentralProcessor.TickType.IDLE.getIndex()];
@@ -82,6 +92,36 @@ public class UsageService
     }
 
     /**
+     * NVML GPU 计算利用率；无卡返回 0
+     */
+    private int getGpu()
+    {
+        return nvmlComponent.getGpuUtilization();
+    }
+
+    /**
+     * NVML 显存占用率；无卡返回 0
+     */
+    private int getVram()
+    {
+        return nvmlComponent.getMemoryUtilization();
+    }
+
+    /**
+     * 采集当前占用率（供 API 与历史采样共用）；不做 firstLaunch 校验
+     */
+    public UsageDto collectUsage()
+    {
+        UsageDto usageDto = new UsageDto();
+        usageDto.setProcessor(getProcessor());
+        usageDto.setRam(getRam());
+        usageDto.setStorage(getStorage());
+        usageDto.setGpu(getGpu());
+        usageDto.setVram(getVram());
+        return usageDto;
+    }
+
+    /**
      * Used to deliver dto to corresponding controller
      *
      * @return ResponseEntityWrapperAsset filled with usageDto
@@ -90,13 +130,7 @@ public class UsageService
     {
         if (!Ward.isFirstLaunch())
         {
-            UsageDto usageDto = new UsageDto();
-
-            usageDto.setProcessor(getProcessor());
-            usageDto.setRam(getRam());
-            usageDto.setStorage(getStorage());
-
-            return usageDto;
+            return collectUsage();
         }
         else
         {

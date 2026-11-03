@@ -71,6 +71,16 @@ let currentProcCount;
 let storageLabelsArray;
 
 /**
+ * GPU 使用率三位数字 span
+ */
+let gpuLabelsArray;
+
+/**
+ * 显存占用脚注文案（如 "42% VRAM"）
+ */
+let currentVramUsage;
+
+/**
  * Used to hold values of total storage
  */
 let currentTotalStorage
@@ -94,6 +104,16 @@ let ramTriangle;
  * Used to manipulate storage triangle div
  */
 let storageTriangle;
+
+/**
+ * GPU 图例三角
+ */
+let gpuTriangle;
+
+/**
+ * VRAM 图例三角
+ */
+let vramTriangle;
 
 /**
  * Used to determine current page

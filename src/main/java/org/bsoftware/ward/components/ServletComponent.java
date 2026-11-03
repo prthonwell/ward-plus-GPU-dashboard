@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * ServletComponent used for application port changing
+ * Tomcat 端口定制器：Spring Boot 创建嵌入式容器时回调。
+ * 首次启动固定 4000；完成 setup / restart 后从 setup.ini 读取用户配置端口。
+ *
  * @author Rudolf Barbu
  * @version 1.0.3
  */
@@ -17,14 +19,13 @@ import java.io.IOException;
 public class ServletComponent implements WebServerFactoryCustomizer<TomcatServletWebServerFactory>
 {
     /**
-     * Autowired UtilitiesComponent object
-     * Used for various utility functions
+     * 读取 setup.ini
      */
     @Autowired
     private UtilitiesComponent utilitiesComponent;
 
     /**
-     * Customizes port of application
+     * 按当前启动阶段绑定监听端口
      *
      * @param tomcatServletWebServerFactory servlet factory
      */
@@ -35,6 +36,7 @@ public class ServletComponent implements WebServerFactoryCustomizer<TomcatServle
         {
             try
             {
+                // 正式运行：使用用户在 setup 页指定的端口
                 File file = new File(Ward.SETUP_FILE_PATH);
                 tomcatServletWebServerFactory.setPort(Integer.parseInt(utilitiesComponent.getFromIniFile(file, "setup", "port")));
             }
@@ -45,6 +47,7 @@ public class ServletComponent implements WebServerFactoryCustomizer<TomcatServle
         }
         else
         {
+            // 初始化向导阶段：固定使用 4000
             tomcatServletWebServerFactory.setPort(Ward.INITIAL_PORT);
         }
     }

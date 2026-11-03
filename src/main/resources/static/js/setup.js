@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * Initializes dom objects
+ * 初始化向导页：绑定主题切换与 LAUNCH 提交按钮
  */
 function setupInitialization()
 {
@@ -84,7 +84,8 @@ function setAlertStyle(styleName)
 }
 
 /**
- * Sends settings request
+ * POST /api/setup 提交配置；成功后跳转到用户指定的新端口（后端会 restart）
+ * 注意：端口不能仍为 4000（与 INITIAL_PORT 冲突）
  */
 function sendSetupRequest()
 {
@@ -97,6 +98,7 @@ function sendSetupRequest()
         {
             if (this.status == 200)
             {
+                // 后端已重启并切换端口，浏览器跟到新地址
                 submit.value = "LOADING";
                 window.location = "http://" + window.location.hostname + ":" + port.value;
             }

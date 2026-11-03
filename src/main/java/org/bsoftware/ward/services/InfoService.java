@@ -1,6 +1,7 @@
 package org.bsoftware.ward.services;
 
 import org.bsoftware.ward.Ward;
+import org.bsoftware.ward.components.NvmlComponent;
 import org.bsoftware.ward.components.UtilitiesComponent;
 import org.bsoftware.ward.dto.*;
 import org.bsoftware.ward.exceptions.ApplicationNotSetUpException;
@@ -15,7 +16,8 @@ import java.io.InputStream;
 import java.util.*;
 
 /**
- * InfoService provides various information about machine, such as processor name, core count, Ram amount, etc.
+ * 静态/半静态机器信息采集服务（基于 OSHI + NVML）。
+ * 汇总 CPU、内存、磁盘、GPU、运行时长、服务器名、项目版本等，供首页模板渲染与 /api/info 轮询刷新。
  *
  * @author Rudolf Barbu
  * @version 1.0.2
@@ -24,18 +26,37 @@ import java.util.*;
 public class InfoService
 {
     /**
-     * Autowired SystemInfo object
-     * Used for getting machine information
+     * OSHI 系统信息入口，跨平台读取硬件与操作系统数据
      */
     @Autowired
     private SystemInfo systemInfo;
 
     /**
-     * Autowired UtilitiesComponent object
-     * Used for various utility functions
+     * 从 setup.ini 读取服务器显示名等配置项
      */
     @Autowired
     private UtilitiesComponent utilitiesComponent;
+
+    /**
+     * NVIDIA NVML：GPU 名称 / 驱动 / 显存总量
+     */
+    @Autowired
+    private NvmlComponent nvmlComponent;
+
+    /**
+     * CPU 静态信息缓存：Apple Silicon 上反复读频率会刷 sysctl ERROR，且值几乎不变
+     */
+    private volatile ProcessorDto cachedProcessor;
+
+    /**
+     * GPU 静态信息缓存
+     */
+    private volatile GpuDto cachedGpu;
+
+    /**
+     * 项目版本缓存
+     */
+    private volatile ProjectDto cachedProject;
 
     /**
      * Converts frequency to most readable format
@@ -84,12 +105,17 @@ public class InfoService
     }
 
     /**
-     * Gets processor information
+     * Gets processor information（结果缓存，避免每秒触发 Apple Silicon 上无效的 sysctl）
      *
      * @return ProcessorDto with filled fields
      */
     private ProcessorDto getProcessor()
     {
+        if (cachedProcessor != null)
+        {
+            return cachedProcessor;
+        }
+
         ProcessorDto processorDto = new ProcessorDto();
 
         CentralProcessor centralProcessor = systemInfo.getHardware().getProcessor();
@@ -103,11 +129,13 @@ public class InfoService
 
         int coreCount = centralProcessor.getLogicalProcessorCount();
         processorDto.setCoreCount(coreCount + ((coreCount > 1) ? " Cores" : " Core"));
+        // Apple Silicon 常无 hw.cpufrequency，可能得到 0 MHz；只读一次即可
         processorDto.setClockSpeed(getConvertedFrequency(centralProcessor.getCurrentFreq()));
 
         String BitDepthPrefix = centralProcessor.getProcessorIdentifier().isCpu64bit() ? "64" : "32";
         processorDto.setBitDepth(BitDepthPrefix + "-bit");
 
+        cachedProcessor = processorDto;
         return processorDto;
     }
 
@@ -227,6 +255,11 @@ public class InfoService
      */
     private ProjectDto getProject() throws IOException
     {
+        if (cachedProject != null)
+        {
+            return cachedProject;
+        }
+
         ProjectDto projectDto = new ProjectDto();
         Properties properties = new Properties();
         InputStream inputStream = getClass().getResourceAsStream("/META-INF/maven/org.b-software/ward/pom.properties");
@@ -243,11 +276,54 @@ public class InfoService
             projectDto.setVersion("Developer mode");
         }
 
+        cachedProject = projectDto;
         return projectDto;
     }
 
     /**
-     * Used to deliver dto to corresponding controller
+     * 通过 NVML 读取第一张 NVIDIA GPU 的静态信息；不可用时 available=false（结果缓存）
+     */
+    private GpuDto getGpu()
+    {
+        if (cachedGpu != null)
+        {
+            return cachedGpu;
+        }
+
+        GpuDto gpuDto = new GpuDto();
+
+        if (!nvmlComponent.isAvailable() || nvmlComponent.getDeviceCount() < 1)
+        {
+            gpuDto.setAvailable(false);
+            gpuDto.setName("No NVIDIA GPU");
+            gpuDto.setDriverVersion("N/A");
+            gpuDto.setTotalMemory("0 MiB VRAM");
+            gpuDto.setGpuCount("0 GPU");
+            cachedGpu = gpuDto;
+            return gpuDto;
+        }
+
+        gpuDto.setAvailable(true);
+
+        String name = nvmlComponent.getName();
+        gpuDto.setName(name != null ? name : "NVIDIA GPU");
+
+        String driverVersion = nvmlComponent.getDriverVersion();
+        gpuDto.setDriverVersion(driverVersion != null ? ("Driver " + driverVersion) : "Driver N/A");
+
+        // getConvertedCapacity 实际按字节换算（与 OSHI memory/disk 用法一致）
+        gpuDto.setTotalMemory(getConvertedCapacity(nvmlComponent.getTotalMemoryBytes()) + " VRAM");
+
+        int gpuCount = nvmlComponent.getDeviceCount();
+        gpuDto.setGpuCount(gpuCount + ((gpuCount > 1) ? " GPUs" : " GPU"));
+
+        cachedGpu = gpuDto;
+        return gpuDto;
+    }
+
+    /**
+     * 组装完整 InfoDto；未完成 setup 时拒绝访问。
+     * 前端每秒轮询 /api/info，主要用于刷新时钟频率、进程数、磁盘总量与 uptime。
      *
      * @return InfoDto filled with server info
      */
@@ -260,6 +336,7 @@ public class InfoService
             infoDto.setProcessor(getProcessor());
             infoDto.setMachine(getMachine());
             infoDto.setStorage(getStorage());
+            infoDto.setGpu(getGpu());
             infoDto.setUptime(getUptime());
             infoDto.setSetup(getSetup());
             infoDto.setProject(getProject());

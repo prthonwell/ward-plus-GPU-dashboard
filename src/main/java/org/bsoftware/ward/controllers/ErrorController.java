@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * ErrorController displays error pages of Ward application
+ * Spring Boot 错误页入口：映射 /error，按状态展示 404 等页面（未 setup 时仍回 setup）
  *
  * @author Rudolf Barbu
  * @version 1.0.2

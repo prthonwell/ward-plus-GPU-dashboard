@@ -46,4 +46,12 @@
 
     /* purple */
     --purple-light: rgba(228, 227, 239, 1);
+
+    /* orange — GPU */
+    --orange-light: rgba(255, 236, 210, 1);
+    --orange: rgba(255, 159, 67, 1);
+
+    /* violet — VRAM */
+    --violet-light: rgba(232, 220, 252, 1);
+    --violet: rgba(156, 89, 249, 1);
 }

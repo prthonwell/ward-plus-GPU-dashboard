@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * InfoController displays responses from rest API
+ * 机器信息 API：GET /api/info，返回 CPU/内存/磁盘/uptime 等描述性数据（前端每秒刷新）
  *
  * @author Rudolf Barbu
  * @version 1.0.1
@@ -19,14 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class InfoController
 {
     /**
-     * Autowired InfoService object
-     * Used for getting information about server
+     * 通过 OSHI 组装 InfoDto
      */
     @Autowired
     private InfoService infoService;
 
     /**
-     * Get request to display current usage information for processor, RAM and storage
+     * 获取当前服务器静态/半静态信息
      *
      * @return ResponseEntity to servlet
      */

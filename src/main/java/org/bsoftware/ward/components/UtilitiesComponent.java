@@ -7,7 +7,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * UtilitiesComponent provides various functions, which are used in different classes
+ * 通用工具组件：封装 setup.ini 读取（端口、主题、服务器名等配置项）
+ *
  * @author Rudolf Barbu
  * @version 1.0.2
  */
@@ -15,7 +16,7 @@ import java.io.IOException;
 public class UtilitiesComponent
 {
     /**
-     * Gets string data from ini file
+     * 按 section/option 读取 ini 中的字符串值；文件不存在返回 null
      *
      * @param file ini file
      * @param sectionName section in ini filr
@@ -37,7 +38,7 @@ public class UtilitiesComponent
     }
 
     /**
-     * Gets theme name from setup ini file
+     * 快捷读取当前主题：light 或 dark
      *
      * @return String wth theme name
      * @throws IOException if file does not exists

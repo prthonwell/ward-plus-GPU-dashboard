@@ -1,0 +1,6 @@
+.idea/
+target/
+*.iml
+setup.ini
+usage-history.jsonl
+usage-history.jsonl.tmp

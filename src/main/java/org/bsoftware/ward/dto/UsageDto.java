@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * UsageDto is a values container for presenting server usage
+ * /api/usage 响应：processor / ram / storage / gpu / vram 的 0–100 使用率
  *
  * @author Rudolf Barbu
  * @version 1.0.1
@@ -27,4 +27,14 @@ public class UsageDto
      * Storage usage field
      */
     private int storage;
+
+    /**
+     * NVIDIA GPU 计算利用率（NVML）；无卡时为 0
+     */
+    private int gpu;
+
+    /**
+     * 显存占用率 used/total（NVML）；无卡时为 0
+     */
+    private int vram;
 }

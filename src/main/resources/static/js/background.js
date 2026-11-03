@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * Initializes dynamic background
+ * 用 Vanta FOG 初始化动态雾效背景，颜色随 light/dark 主题切换
  */
 function backgroundInitialization()
 {

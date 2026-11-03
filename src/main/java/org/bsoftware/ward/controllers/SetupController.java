@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 /**
- * SetupController displays responses from rest API
+ * 初始化 API：POST /api/setup，接收 setup 页提交的服务器名 / 主题 / 端口并落盘重启
  *
  * @author Rudolf Barbu
  * @version 1.0.1
@@ -19,14 +19,13 @@ import javax.validation.Valid;
 public class SetupController
 {
     /**
-     * Autowired SetupService object
-     * Used for posting settings information in ini file
+     * 写入 setup.ini 并触发应用重启
      */
     @Autowired
     private SetupService setupService;
 
     /**
-     * Posting setup info in database
+     * 校验 SetupDto 后保存配置；成功后前端会跳转到新端口
      *
      * @param setupDto dto with data
      * @return ResponseEntity to servlet
