@@ -172,13 +172,13 @@ function applyHistoryToCharts(points)
 }
 
 /**
- * 方案 A：约 50 个点铺满整个所选区间（如 3h → 12:20～15:20）。
- * step = range/49；右端对齐到 floor(now/step)*step，避免刷新时旧点挪槽。
+ * 方案 A：约 75 个点铺满整个所选区间（如 3h → 12:20～15:20）。
+ * step = range/74；右端对齐到 floor(now/step)*step，避免刷新时旧点挪槽。
  * 每个窗口 (t-step, t] 取最新采样，没有则 0。
  */
 function buildFilledHistorySeries(points, range)
 {
-    let targetPoints = 50;
+    let targetPoints = 75;
     let windowMs = rangeToMillis(range);
     let stepMs = Math.max(1, Math.floor(windowMs / (targetPoints - 1)));
     let end = Math.floor(Date.now() / stepMs) * stepMs;
@@ -198,7 +198,7 @@ function buildFilledHistorySeries(points, range)
 
     for (let i = 0; i < targetPoints; i++)
     {
-        // 第 0 点 = end - 49*step，最后一点 = 对齐后的 end
+        // 第 0 点 = end - 74*step，最后一点 = 对齐后的 end
         let slotEnd = end - (targetPoints - 1 - i) * stepMs;
         let slotStart = slotEnd - stepMs;
 
@@ -292,11 +292,22 @@ function buildDataset(borderColor, backgroundColor, label)
         borderWidth: 1.5,
         borderColor: borderColor,
         pointRadius: 0,
-        pointHoverRadius: 3,
+        pointHoverRadius: 4,
+        pointHitRadius: 10,
         pointBackgroundColor: "rgba(255, 255, 255, 1)",
         backgroundColor: backgroundColor,
         data: []
     };
+}
+
+function formatUsagePercent(value)
+{
+    let number = Number(value);
+    if (isNaN(number))
+    {
+        return "—";
+    }
+    return (Math.round(number * 10) / 10) + "%";
 }
 
 function buildCommonOptions()
@@ -306,6 +317,34 @@ function buildCommonOptions()
         legend:
         {
             display: false
+        },
+        // 悬停显示时间点与利用率百分比；沿纵线吸附，不必精确点到折线
+        tooltips:
+        {
+            enabled: true,
+            mode: "index",
+            intersect: false,
+            callbacks:
+            {
+                title: function(tooltipItems)
+                {
+                    if (!tooltipItems || tooltipItems.length === 0)
+                    {
+                        return "";
+                    }
+                    return tooltipItems[0].label || "";
+                },
+                label: function(tooltipItem, data)
+                {
+                    let datasetLabel = data.datasets[tooltipItem.datasetIndex].label || "";
+                    return datasetLabel + ": " + formatUsagePercent(tooltipItem.yLabel);
+                }
+            }
+        },
+        hover:
+        {
+            mode: "index",
+            intersect: false
         },
         elements:
         {
