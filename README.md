@@ -1,8 +1,3 @@
-<h3 align = "center">
-    <img src = "images/logo.png" alt = "Logo" />
-</h3>
-
----
 
 ### About
 
