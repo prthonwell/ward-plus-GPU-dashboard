@@ -159,7 +159,7 @@ function loadUsageHistory()
 }
 
 /**
- * 把历史点灌进四张图：按当前区间铺满整段横轴，缺失采样填 0
+ * 把历史点灌进四张图
  */
 function applyHistoryToCharts(points)
 {
@@ -172,18 +172,22 @@ function applyHistoryToCharts(points)
 }
 
 /**
- * 方案 A：约 75 个点铺满整个所选区间（如 3h → 12:20～15:20）。
- * step = range/74；右端对齐到 floor(now/step)*step，避免刷新时旧点挪槽。
- * 每个窗口 (t-step, t] 取最新采样，没有则 0。
+ * 按原始采样聚合，避免固定时间槽与 8s 采样错位产生「假 0」。
+ * - 10m：每条记录一个点
+ * - 1h：每 6 条平均融成一个点
+ * - 3h：每 16 条平均融成一个点
+ * 从右侧对齐完整分组，左侧不足一组的余数丢弃；标签取该组最后一条时间。
  */
 function buildFilledHistorySeries(points, range)
 {
-    let targetPoints = 75;
     let windowMs = rangeToMillis(range);
-    let stepMs = Math.max(1, Math.floor(windowMs / (targetPoints - 1)));
-    let end = Math.floor(Date.now() / stepMs) * stepMs;
+    let chunkSize = rangeToChunkSize(range);
+    let cutoff = Date.now() - windowMs;
 
-    let sorted = (points || []).slice().sort(function(a, b)
+    let sorted = (points || []).filter(function(point)
+    {
+        return point && point.timestamp > cutoff;
+    }).sort(function(a, b)
     {
         return a.timestamp - b.timestamp;
     });
@@ -194,45 +198,22 @@ function buildFilledHistorySeries(points, range)
     let disk = [];
     let gpu = [];
     let vram = [];
-    let searchIndex = 0;
 
-    for (let i = 0; i < targetPoints; i++)
+    // 右侧对齐：余数留在最左侧并丢弃，保证每组都是完整 chunkSize 条
+    let startIndex = sorted.length % chunkSize;
+
+    for (let i = startIndex; i < sorted.length; i += chunkSize)
     {
-        // 第 0 点 = end - 74*step，最后一点 = 对齐后的 end
-        let slotEnd = end - (targetPoints - 1 - i) * stepMs;
-        let slotStart = slotEnd - stepMs;
+        let chunk = sorted.slice(i, i + chunkSize);
+        let averaged = averageHistoryChunk(chunk);
+        let anchor = chunk[chunk.length - 1];
 
-        labels.push(formatHistoryTime(slotEnd));
-
-        while (searchIndex < sorted.length && sorted[searchIndex].timestamp <= slotStart)
-        {
-            searchIndex++;
-        }
-
-        let chosen = null;
-        let probe = searchIndex;
-        while (probe < sorted.length && sorted[probe].timestamp <= slotEnd)
-        {
-            chosen = sorted[probe];
-            probe++;
-        }
-
-        if (chosen)
-        {
-            cpu.push(chosen.processor);
-            ram.push(chosen.ram);
-            disk.push(chosen.storage);
-            gpu.push(chosen.gpu);
-            vram.push(chosen.vram);
-        }
-        else
-        {
-            cpu.push(0);
-            ram.push(0);
-            disk.push(0);
-            gpu.push(0);
-            vram.push(0);
-        }
+        labels.push(formatHistoryTime(anchor.timestamp));
+        cpu.push(averaged.processor);
+        ram.push(averaged.ram);
+        disk.push(averaged.storage);
+        gpu.push(averaged.gpu);
+        vram.push(averaged.vram);
     }
 
     return {
@@ -242,6 +223,49 @@ function buildFilledHistorySeries(points, range)
         disk: disk,
         gpu: gpu,
         vram: vram
+    };
+}
+
+function rangeToChunkSize(range)
+{
+    switch (range)
+    {
+        case "1h":
+            return 6;
+        case "3h":
+            return 16;
+        case "10m":
+        default:
+            return 1;
+    }
+}
+
+function averageHistoryChunk(chunk)
+{
+    let total = {
+        processor: 0,
+        ram: 0,
+        storage: 0,
+        gpu: 0,
+        vram: 0
+    };
+
+    for (let i = 0; i < chunk.length; i++)
+    {
+        total.processor += Number(chunk[i].processor) || 0;
+        total.ram += Number(chunk[i].ram) || 0;
+        total.storage += Number(chunk[i].storage) || 0;
+        total.gpu += Number(chunk[i].gpu) || 0;
+        total.vram += Number(chunk[i].vram) || 0;
+    }
+
+    let count = chunk.length;
+    return {
+        processor: total.processor / count,
+        ram: total.ram / count,
+        storage: total.storage / count,
+        gpu: total.gpu / count,
+        vram: total.vram / count
     };
 }
 
