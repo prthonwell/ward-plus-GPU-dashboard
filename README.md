@@ -6,9 +6,11 @@
 
 ### About
 
-Ward is a simple and minimalistic server monitoring tool. Ward supports adaptive design system. Also, it supports dark theme.
-It shows only principal information and can be used, if you want to see nice looking dashboard instead looking on bunch of numbers and graphs.
-Ward works nice on all popular operating systems, because it uses [OSHI](https://github.com/oshi/oshi).
+originally from WARD
+
+Useing [OSHI](https://github.com/oshi/oshi) for cpu，memo and disk inspection
+
+I added Nvidia-smi-tool-kit for nvidia GPU inspection and history display bars for all resources.
 
 **All features tested on:** `Windows` `Linux`
 
@@ -35,3 +37,4 @@ Ward works nice on all popular operating systems, because it uses [OSHI](https:/
     • Download latest .jar from releases section
     • Execute jar on Windows or Linux with administrative rights
     • Enter localhost:4000 and set up application
+    • if you want GPU inspection function make sure there is Nvidia-smi-tool-kit
